@@ -203,3 +203,29 @@ describe("cadastro inicial e serviço de produtos", () => {
     expect(res.ok).toBe(false);
   });
 });
+
+describe("catálogo público avaliado por produto", () => {
+  it("exibe itens permitidos mesmo com itens bloqueados no banco", () => {
+    const db = openDatabase(":memory:");
+    // 17 itens bloqueados do cadastro inicial continuam no banco
+    expect(listAdminProducts(db)).toHaveLength(17);
+    const a = saveProduct(admin, regularInput({ name: "Creatina Monohidratada Exemplo", presentation: "300 g", price_cents: 8990 }), undefined, db);
+    const b = saveProduct(
+      admin,
+      regularInput({ name: "Multivitamínico Exemplo", presentation: "60 cápsulas", regulatory_status: "divulgacao_restrita", show_price: false, commercially_available: false, whatsapp_orders: false }),
+      undefined,
+      db,
+    );
+    const c = saveProduct(admin, regularInput({ name: "Ômega 3 Exemplo", regulatory_status: "pendente_verificacao", publish_info: false, show_price: false, commercially_available: false, whatsapp_orders: false }), undefined, db);
+    expect([a.ok, b.ok, c.ok]).toEqual([true, true, true]);
+
+    const pub = listPublicProducts(db);
+    expect(pub.map((p) => p.name).sort()).toEqual(["Creatina Monohidratada Exemplo", "Multivitamínico Exemplo"]);
+    const creatina = pub.find((p) => p.name.startsWith("Creatina"))!;
+    expect(creatina.price_cents).toBe(8990);
+    const multi = pub.find((p) => p.name.startsWith("Multi"))!;
+    expect(multi.price_cents).toBeNull();
+    expect(multi.whatsapp_order).toBe(false);
+    expect(pub.some((p) => /Lander/.test(p.name))).toBe(false);
+  });
+});

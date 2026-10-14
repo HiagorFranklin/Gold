@@ -104,8 +104,8 @@ export function CatalogBrowser({ products, categories, initialCategory = "" }: P
         <div className="mt-6">
           {products.length === 0 ? (
             <EmptyCatalog
-              title="Catálogo em verificação"
-              text="Os itens do catálogo estão passando por verificação regulatória e serão exibidos somente após a confirmação da sua regularidade. Enquanto isso, consulte o conteúdo educativo ou fale com a nossa equipe."
+              title="Nenhum produto em exibição"
+              text="No momento não há produtos com divulgação permitida para exibir. Fale com a nossa equipe para informações sobre o atendimento ou consulte o conteúdo educativo."
             />
           ) : (
             <EmptyCatalog title="Nenhum item encontrado" text="Ajuste a pesquisa ou os filtros para ver outros resultados." />

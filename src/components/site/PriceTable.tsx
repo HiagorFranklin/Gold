@@ -111,10 +111,10 @@ export function PriceTable({ rows, categories }: { rows: Row[]; categories: { sl
       {list.length === 0 ? (
         <div className="mt-6">
           <EmptyCatalog
-            title={rows.length === 0 ? "Tabela em atualização" : "Nenhum item encontrado"}
+            title={rows.length === 0 ? "Nenhum valor em exibição" : "Nenhum item encontrado"}
             text={
               rows.length === 0
-                ? "Os valores são publicados somente para itens com regularidade sanitária verificada. Fale com a nossa equipe para mais informações sobre o atendimento."
+                ? "No momento não há itens com divulgação de valores permitida. Fale com a nossa equipe para mais informações sobre o atendimento."
                 : "Ajuste a pesquisa ou o filtro de categoria."
             }
           />

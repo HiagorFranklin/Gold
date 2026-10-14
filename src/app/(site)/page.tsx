@@ -110,7 +110,7 @@ export default function HomePage() {
                 />
                 <div className="relative">
                   <p className="text-[11px] uppercase tracking-[0.2em] text-gold/80">
-                    {n > 0 ? `${n} ${n === 1 ? "item" : "itens"}` : "Em atualização"}
+                    {n > 0 ? `${n} ${n === 1 ? "item" : "itens"}` : "Sem itens em exibição"}
                   </p>
                   <h3 className="mt-2 font-display text-2xl font-semibold leading-tight">{c.name}</h3>
                   <p className="mt-2 text-sm text-mist">{c.description}</p>

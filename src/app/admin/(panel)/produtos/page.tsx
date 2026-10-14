@@ -39,7 +39,10 @@ export default async function ProductsAdmin({ searchParams }: { searchParams: Pr
         <button className="btn-outline !py-2.5">Filtrar</button>
       </form>
 
-      <p className="mb-3 text-sm text-mist">{products.length} produto(s)</p>
+      <p className="mb-3 text-sm text-mist">
+        {products.length} produto(s) · {products.filter((p) => p.compliance.effective.publicListing).length} no catálogo público ·{" "}
+        {products.filter((p) => p.compliance.hardBlocked).length} com proibição vigente. Cada item é avaliado individualmente.
+      </p>
       <div className="card-gp overflow-x-auto">
         <table className="w-full min-w-[900px] text-left text-sm">
           <thead className="border-b border-gold/25 text-[11px] uppercase tracking-[0.14em] text-gold">
