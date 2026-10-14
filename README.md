@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gold Pharma — plataforma web
 
-## Getting Started
+Site institucional com catálogo, tabela de valores, conteúdo educativo de saúde, integração com WhatsApp e painel administrativo protegido.
 
-First, run the development server:
+## Tecnologias
+
+- Next.js 15 (App Router, Server Actions) + React 19 + TypeScript
+- Tailwind CSS 4 (tema preto `#0A0A0A`, grafite `#191919`, dourado `#D4AF37`)
+- SQLite (better-sqlite3) — banco local criado e populado automaticamente na primeira execução
+- bcrypt para senhas, sessões em cookie httpOnly com token aleatório (hash SHA-256 no banco)
+- Zod para validação no servidor · Vitest para testes
+
+## Executar localmente
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # defina ADMIN_EMAIL e ADMIN_PASSWORD
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Painel: `http://localhost:3000/admin` (login com as credenciais do `.env.local`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Produção: `npm run build && npm start`. Mantenha a pasta `data/` (banco e imagens) em armazenamento persistente e faça backup dela.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Testes: `npm test` (regras regulatórias, permissões, auditoria, formatação e WhatsApp).
 
-## Learn More
+## Estrutura
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+  app/(site)/          páginas públicas: início, catálogo, ficha, tabela de valores, saúde, sobre, contato, políticas
+  app/admin/           login, painel (produtos, categorias, saúde, site/WhatsApp, mensagens, auditoria, usuários, conta) e server actions
+  app/uploads/         entrega das imagens enviadas pelo painel
+  components/site/     cabeçalho, rodapé, cards, tabela, imagens cinematográficas
+  components/admin/    formulários e componentes do painel
+  lib/compliance.ts    regras sanitárias (fonte única do que pode ser exibido ao público)
+  lib/product-service.ts  gravação de produtos com validação, permissões e auditoria
+  lib/data.ts          consultas; a camada pública só devolve campos liberados
+  lib/seed.ts          dados iniciais (17 itens informados, conteúdo educativo, textos-modelo)
+tests/                 testes automatizados
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Regras de publicação
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Cada produto tem status regulatório (pendente de verificação, em análise documental, regularidade confirmada, divulgação restrita, comercialização bloqueada), justificativa, fonte, data e responsável, além de controles separados para ficha pública, preço, disponibilidade e pedido via WhatsApp.
 
-## Deploy on Vercel
+O servidor só libera um recurso quando a situação permite:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Status | Ficha pública | Preço / disponibilidade / WhatsApp |
+|---|---|---|
+| Pendente, Em análise, Bloqueada | não | não |
+| Divulgação restrita | sim (se marcada) | não |
+| Regularidade confirmada + registro Anvisa, fonte e data | sim (se marcada) | sim (se marcados) |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Proibições vigentes ficam em `src/lib/compliance.ts` (`HARD_RULES`) e prevalecem sobre qualquer status escolhido no painel: anabolizantes da lista C5 (Portaria 344/98), princípios ativos sem uso humano autorizado, medicamentos de venda sob prescrição (RDC 96/2008) e fabricantes sem registro na Anvisa. O painel exibe “Exibição comercial bloqueada — verificar situação regulatória” nesses itens. Mudar uma dessas regras exige alteração de código revisada, com documentação oficial.
+
+## Configurações
+
+- **WhatsApp:** painel → Site e WhatsApp → número com DDD. Os links seguem `https://wa.me/55DDDNUMERO?text=...`; o cliente revisa e envia a mensagem manualmente.
+- **Imagens:** envie fotografias próprias/licenciadas no painel (banner, treino, recuperação, nutrição, ciência, institucional, categorias, produtos). Sem imagem, o site exibe uma composição gráfica da marca como espaço reservado.
+- **Textos legais:** política de privacidade, termos e informações legais vêm como modelos e devem ser revisados por assessoria jurídica.
+
+## Supabase (opcional)
+
+O acesso a dados está concentrado em `src/lib/db.ts`, `src/lib/data.ts` e `src/lib/product-service.ts`. Para migrar para Supabase/Postgres, reproduza o esquema de `db.ts` e substitua essas funções; as regras de `compliance.ts` não mudam.
