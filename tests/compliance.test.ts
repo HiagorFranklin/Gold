@@ -229,3 +229,21 @@ describe("catálogo público avaliado por produto", () => {
     expect(pub.some((p) => /Lander/.test(p.name))).toBe(false);
   });
 });
+
+describe("consulta regulatória", async () => {
+  const { displayGroup, publicVisibilitySummary } = await import("@/lib/compliance");
+  it("classifica os quatro grupos e mantém os 17 itens como bloqueados", () => {
+    const db = openDatabase(":memory:");
+    saveProduct(admin, regularInput({ name: "Aprovado X" }), undefined, db);
+    saveProduct(admin, regularInput({ name: "Restrito X", regulatory_status: "divulgacao_restrita", show_price: false, commercially_available: false, whatsapp_orders: false }), undefined, db);
+    saveProduct(admin, regularInput({ name: "Pendente X", regulatory_status: "pendente_verificacao", publish_info: false, show_price: false, commercially_available: false, whatsapp_orders: false }), undefined, db);
+    const groups = listAdminProducts(db).map((p) => [p.name, displayGroup(p.regulatory_status, p.compliance), publicVisibilitySummary(p.compliance)]);
+    const by = (n: string) => groups.find((g) => g[0] === n)!;
+    expect(by("Aprovado X").slice(1)).toEqual(["aprovado", "Ficha, preço e pedido via WhatsApp"]);
+    expect(by("Restrito X").slice(1)).toEqual(["restrito", "Ficha informativa, não disponível para oferta"]);
+    expect(by("Pendente X").slice(1)).toEqual(["pendente", "Oculto do site"]);
+    const blocked = groups.filter((g) => g[1] === "bloqueado");
+    expect(blocked).toHaveLength(17);
+    expect(blocked.every((g) => g[2] === "Oculto do site")).toBe(true);
+  });
+});

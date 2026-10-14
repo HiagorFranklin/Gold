@@ -147,7 +147,7 @@ export function PriceTable({ rows, categories }: { rows: Row[]; categories: { sl
                     </td>
                     <td className="px-5 py-3 text-mist">{r.presentation}</td>
                     <td className="px-5 py-3 text-right font-semibold text-gold">
-                      {r.price_cents != null ? formatBRL(r.price_cents) : <span className="text-xs font-normal text-mist-2">Não divulgado</span>}
+                      {r.price_cents != null ? formatBRL(r.price_cents) : <span className="text-xs font-normal text-mist-2">Não disponível para oferta</span>}
                     </td>
                     <td className="px-5 py-3 text-mist">{r.availability ? AVAILABILITY_LABEL[r.availability] : "—"}</td>
                     <td className="px-5 py-3 text-right">{action(r)}</td>
@@ -168,7 +168,7 @@ export function PriceTable({ rows, categories }: { rows: Row[]; categories: { sl
                   <p className="text-xs text-mist">{r.presentation}</p>
                   <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                     <div>
-                      <p className="font-semibold text-gold">{r.price_cents != null ? formatBRL(r.price_cents) : <span className="text-xs font-normal text-mist-2">Valor não divulgado</span>}</p>
+                      <p className="font-semibold text-gold">{r.price_cents != null ? formatBRL(r.price_cents) : <span className="text-xs font-normal text-mist-2">Não disponível para oferta</span>}</p>
                       <p className="text-xs text-mist-2">{r.availability ? AVAILABILITY_LABEL[r.availability] : "—"}</p>
                     </div>
                     {action(r)}

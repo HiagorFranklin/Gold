@@ -72,7 +72,7 @@ export default async function ProductPage({ params }: Params) {
             <div>
               <p className="text-[11px] uppercase tracking-[0.16em] text-mist-2">Valor</p>
               <p className="mt-1 text-3xl font-semibold text-gold">
-                {product.price_cents != null ? formatBRL(product.price_cents) : <span className="text-base font-normal text-mist">Não divulgado</span>}
+                {product.price_cents != null ? formatBRL(product.price_cents) : <span className="text-base font-normal text-mist">Não disponível para oferta</span>}
               </p>
               {product.availability && <p className="mt-1 text-sm text-mist">{AVAILABILITY_LABEL[product.availability]}</p>}
             </div>

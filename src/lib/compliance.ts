@@ -231,3 +231,39 @@ export function validateRegulatoryWrite(p: ComplianceInput): string[] {
   }
   return errors;
 }
+
+/** Classificação de exibição usada na consulta regulatória do painel. */
+export const DISPLAY_GROUPS = ["aprovado", "pendente", "restrito", "bloqueado"] as const;
+export type DisplayGroup = (typeof DISPLAY_GROUPS)[number];
+
+export const DISPLAY_GROUP_LABELS: Record<DisplayGroup, string> = {
+  aprovado: "Aprovado para publicação",
+  pendente: "Pendente de verificação",
+  restrito: "Restrito",
+  bloqueado: "Bloqueado",
+};
+
+export const DISPLAY_GROUP_HINTS: Record<DisplayGroup, string> = {
+  aprovado: "Regularidade confirmada e documentada. Pode exibir ficha, preço e pedido conforme os controles.",
+  pendente: "Aguardando verificação ou documentação. Não aparece no site.",
+  restrito: "Divulgação apenas informativa: ficha sem preço, sem disponibilidade e sem pedido.",
+  bloqueado: "Proibição vigente ou comercialização bloqueada. Não aparece no site.",
+};
+
+export function displayGroup(status: RegulatoryStatus, result: ComplianceResult): DisplayGroup {
+  if (result.hardBlocked || status === "comercializacao_bloqueada") return "bloqueado";
+  if (status === "divulgacao_restrita") return "restrito";
+  if (status === "regularidade_confirmada" && result.denials.every((d) => !d.includes("registre nº de registro")))
+    return "aprovado";
+  return "pendente";
+}
+
+/** Descrição curta do que o público vê para o item. */
+export function publicVisibilitySummary(result: ComplianceResult): string {
+  const e = result.effective;
+  if (!e.publicListing) return "Oculto do site";
+  if (e.whatsappOrder) return "Ficha, preço e pedido via WhatsApp";
+  if (e.price && e.availability) return "Ficha, preço e disponibilidade";
+  if (e.price) return "Ficha e preço";
+  return "Ficha informativa, não disponível para oferta";
+}

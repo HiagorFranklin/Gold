@@ -37,7 +37,7 @@ export function ProductCard({ product }: { product: PublicProduct }) {
             {product.price_cents != null ? (
               <p className="text-lg font-semibold text-gold">{formatBRL(product.price_cents)}</p>
             ) : (
-              <p className="text-xs text-mist-2">Valor não divulgado</p>
+              <p className="text-xs text-mist-2">Não disponível para oferta</p>
             )}
             {product.availability && <p className="text-xs text-mist">{AVAILABILITY_LABEL[product.availability]}</p>}
           </div>

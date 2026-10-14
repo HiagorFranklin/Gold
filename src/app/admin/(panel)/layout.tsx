@@ -14,6 +14,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   const items = [
     { href: "/admin", label: "Visão geral" },
     { href: "/admin/produtos", label: "Produtos" },
+    { href: "/admin/consulta-regulatoria", label: "Consulta regulatória" },
     { href: "/admin/categorias", label: "Categorias" },
     { href: "/admin/saude", label: "Conteúdo de saúde" },
     ...(can(actor, "settings:edit") ? [{ href: "/admin/configuracoes", label: "Site e WhatsApp" }] : []),
