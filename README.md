@@ -63,3 +63,14 @@ Proibições vigentes ficam em `src/lib/compliance.ts` (`HARD_RULES`) e prevalec
 ## Supabase (opcional)
 
 O acesso a dados está concentrado em `src/lib/db.ts`, `src/lib/data.ts` e `src/lib/product-service.ts`. Para migrar para Supabase/Postgres, reproduza o esquema de `db.ts` e substitua essas funções; as regras de `compliance.ts` não mudam.
+
+## Créditos das fotografias padrão
+
+Fotos gratuitas sob a [Licença Unsplash](https://unsplash.com/license) (uso comercial permitido, sem atribuição obrigatória), carregadas de `images.unsplash.com`. Podem ser trocadas no painel → Site e WhatsApp.
+
+- Banner: Ambitious Studio / Rick Barrett — https://unsplash.com/photos/w7jYaN7GqyA
+- Treino de força: Anastase Maragos — https://unsplash.com/photos/4dlhin0ghOk
+- Recuperação: Hayley Kim Studios — https://unsplash.com/photos/eot-ka5dM7Q
+- Nutrição: Ella Olsson — https://unsplash.com/photos/lMcRyBx4G50
+- Ciência/laboratório: Nathan Rimoux — https://unsplash.com/photos/HRLTL6bmeow
+- Institucional: Mohamed Fareed — https://unsplash.com/photos/rbSNsoXk-3A

@@ -1,4 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
+import { FallbackImg } from "./FallbackImg";
+
 export type SceneVariant = "gym" | "science" | "recovery" | "nutrition" | "endocrine" | "lab" | "brand" | "product";
 
 type Props = {
@@ -14,7 +15,7 @@ type Props = {
 const OVERLAYS = {
   none: "",
   soft: "bg-ink/30",
-  strong: "bg-gradient-to-r from-ink via-ink/80 to-ink/20",
+  strong: "bg-gradient-to-r from-ink/95 via-ink/65 to-ink/10",
   bottom: "bg-gradient-to-t from-ink via-ink/40 to-transparent",
 };
 
@@ -25,22 +26,25 @@ const OVERLAYS = {
  */
 export function SceneImage({ src, alt, variant, className = "", overlay = "soft", priority, zoom = true }: Props) {
   return (
-    <div className={`relative overflow-hidden bg-graphite ${zoom ? "group/scene" : ""} ${className}`}>
-      {src ? (
-        <img
-          src={src}
-          alt={alt}
-          loading={priority ? "eager" : "lazy"}
-          decoding="async"
-          fetchPriority={priority ? "high" : "auto"}
-          className={`absolute inset-0 h-full w-full object-cover transition duration-[1400ms] ease-out ${
-            zoom ? "group-hover/scene:scale-[1.04] group-hover:scale-[1.04]" : ""
-          }`}
-        />
-      ) : (
-        <div role="img" aria-label={alt} className="absolute inset-0">
-          <SceneArt variant={variant} />
-        </div>
+    <div className={`${/\babsolute\b/.test(className) ? "" : "relative"} overflow-hidden bg-graphite ${zoom ? "group/scene" : ""} ${className}`}>
+      <div role={src ? undefined : "img"} aria-label={src ? undefined : alt} className="absolute inset-0">
+        <SceneArt variant={variant} />
+      </div>
+      {src && (
+        <>
+          <FallbackImg
+            src={src}
+            alt={alt}
+            loading={priority ? "eager" : "lazy"}
+            decoding="async"
+            fetchPriority={priority ? "high" : "auto"}
+            className={`absolute inset-0 h-full w-full object-cover text-transparent transition duration-[1400ms] ease-out ${
+              zoom ? "group-hover/scene:scale-[1.04] group-hover:scale-[1.04]" : ""
+            }`}
+          />
+          {/* Tom dourado discreto, iluminação cinematográfica */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(80%_70%_at_75%_15%,rgba(212,175,55,0.18),transparent_60%)] mix-blend-screen" />
+        </>
       )}
       {overlay !== "none" && <div className={`pointer-events-none absolute inset-0 ${OVERLAYS[overlay]}`} />}
     </div>

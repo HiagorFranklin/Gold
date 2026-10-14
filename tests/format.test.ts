@@ -21,3 +21,25 @@ describe("format", () => {
     ]);
   });
 });
+
+describe("migração de configurações v2", async () => {
+  const { openDatabase } = await import("@/lib/db");
+  const { getSettings } = await import("@/lib/data");
+  const { runSeed } = await import("@/lib/seed");
+  it("banco novo já vem com WhatsApp e fotos", () => {
+    const s = getSettings(openDatabase(":memory:"));
+    expect(s.whatsapp_number).toBe("32984762222");
+    expect(s.hero_image_url).toMatch(/^https:\/\/images\.unsplash\.com\//);
+  });
+  it("banco existente preenche só campos vazios", () => {
+    const db = openDatabase(":memory:");
+    db.prepare("UPDATE settings SET value = '1' WHERE key = 'seed_version'").run();
+    db.prepare("UPDATE settings SET value = '11999990000' WHERE key = 'whatsapp_number'").run();
+    db.prepare("UPDATE settings SET value = '' WHERE key = 'hero_image_url'").run();
+    runSeed(db);
+    const s = getSettings(db);
+    expect(s.whatsapp_number).toBe("11999990000");
+    expect(s.hero_image_url).toMatch(/unsplash/);
+    expect(s.seed_version).toBe("2");
+  });
+});

@@ -154,26 +154,26 @@ export const DEFAULT_SETTINGS: Record<string, string> = {
   site_name: "Gold Pharma",
   hero_title: "GOLD PHARMA",
   hero_subtitle: "Conhecimento, qualidade e informação para sua jornada.",
-  hero_image_url: "",
-  hero_image_alt: "Academia moderna com equipamentos de musculação em iluminação escura",
-  training_image_url: "",
-  training_image_alt: "Atleta em treino de força com barra",
-  recovery_image_url: "",
-  recovery_image_alt: "Momento de descanso e recuperação muscular",
-  nutrition_image_url: "",
-  nutrition_image_alt: "Alimentação equilibrada para rotina de treinos",
-  science_image_url: "",
-  science_image_alt: "Pesquisa laboratorial em ambiente farmacêutico",
-  about_image_url: "",
-  about_image_alt: "Ambiente institucional da Gold Pharma",
-  whatsapp_number: "",
+  hero_image_url: "https://images.unsplash.com/photo-1728486145245-d4cb0c9c3470?auto=format&fit=crop&w=2000&q=75",
+  hero_image_alt: "Academia moderna com máquinas de musculação em ambiente escuro",
+  training_image_url: "https://images.unsplash.com/photo-1605296867724-fa87a8ef53fd?auto=format&fit=crop&w=1200&q=75",
+  training_image_alt: "Atleta ao lado de uma barra em academia escura",
+  recovery_image_url: "https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&w=1200&q=75",
+  recovery_image_alt: "Atleta sentada no chão descansando após o treino",
+  nutrition_image_url: "https://images.unsplash.com/photo-1543352632-5a4b24e4d2a6?auto=format&fit=crop&w=1200&q=75",
+  nutrition_image_alt: "Marmitas com refeições equilibradas para a rotina de treinos",
+  science_image_url: "https://images.unsplash.com/photo-1748281296151-b3209b37e1cb?auto=format&fit=crop&w=1400&q=75",
+  science_image_alt: "Pesquisador utilizando pipeta em laboratório",
+  about_image_url: "https://images.unsplash.com/photo-1637430308606-86576d8fef3c?auto=format&fit=crop&w=1200&q=75",
+  about_image_alt: "Fileira de aparelhos de musculação em academia",
+  whatsapp_number: "32984762222",
   whatsapp_message:
     "Olá! Acessei o site da Gold Pharma e gostaria de obter informações sobre o atendimento e o catálogo.",
   contact_email: "",
-  contact_phone: "",
+  contact_phone: "(32) 98476-2222",
   address: "",
   business_hours: "Segunda a sexta, das 9h às 18h",
-  company_legal_name: "",
+  company_legal_name: "Gold Pharma",
   cnpj: "",
   technical_responsible: "",
   about_title: "Ciência, informação e responsabilidade",
@@ -205,6 +205,7 @@ export function runSeed(db: Database.Database) {
     // Garante novas chaves de configuração sem sobrescrever valores existentes.
     const ins = db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)");
     for (const [k, v] of Object.entries(DEFAULT_SETTINGS)) ins.run(k, v);
+    applySettingsV2(db);
     return;
   }
 
@@ -275,7 +276,7 @@ export function runSeed(db: Database.Database) {
       "INSERT INTO audit_log (admin_email, action, entity, details) VALUES ('sistema', 'seed', 'products', ?)",
     ).run(JSON.stringify({ products: PRODUCTS.length, status: "comercializacao_bloqueada" }));
 
-    db.prepare("INSERT INTO settings (key, value) VALUES ('seed_version', '1')").run();
+    db.prepare("INSERT INTO settings (key, value) VALUES ('seed_version', '2')").run();
   });
   tx();
 
@@ -307,4 +308,39 @@ function ensureInitialAdmin(db: Database.Database) {
     );
     console.log(`[gold-pharma] Administrador inicial criado. Credenciais em ${file}`);
   }
+}
+
+/** v2: WhatsApp, nome da empresa e fotografias (Unsplash License). Só preenche campos ainda vazios. */
+const V2_KEYS = [
+  "whatsapp_number",
+  "contact_phone",
+  "company_legal_name",
+  "hero_image_url",
+  "training_image_url",
+  "recovery_image_url",
+  "nutrition_image_url",
+  "science_image_url",
+  "about_image_url",
+  "hero_image_alt",
+  "training_image_alt",
+  "recovery_image_alt",
+  "nutrition_image_alt",
+  "science_image_alt",
+  "about_image_alt",
+];
+
+function applySettingsV2(db: Database.Database) {
+  const version = Number((db.prepare("SELECT value FROM settings WHERE key = 'seed_version'").get() as { value: string }).value);
+  if (version >= 2) return;
+  db.transaction(() => {
+    const url = db.prepare("UPDATE settings SET value = ? WHERE key = ? AND value = ''");
+    for (const k of V2_KEYS.filter((k) => !k.endsWith("_alt"))) url.run(DEFAULT_SETTINGS[k], k);
+    // Textos alternativos acompanham a imagem padrão, se ela foi aplicada agora.
+    const alt = db.prepare("UPDATE settings SET value = ? WHERE key = ? AND (SELECT value FROM settings WHERE key = ?) = ?");
+    for (const k of V2_KEYS.filter((k) => k.endsWith("_alt"))) {
+      const img = k.replace("_alt", "_url");
+      alt.run(DEFAULT_SETTINGS[k], k, img, DEFAULT_SETTINGS[img]);
+    }
+    db.prepare("UPDATE settings SET value = '2' WHERE key = 'seed_version'").run();
+  })();
 }
