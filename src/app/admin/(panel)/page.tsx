@@ -24,7 +24,6 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     !settings.training_image_url && "Imagem de treino",
     !settings.science_image_url && "Imagem de ciência/laboratório",
     !settings.contact_email && !settings.contact_phone && "E-mail ou telefone de contato",
-    !settings.cnpj && "CNPJ e razão social",
   ].filter(Boolean) as string[];
 
   return (

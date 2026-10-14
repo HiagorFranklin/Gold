@@ -40,6 +40,7 @@ describe("migração de configurações v2", async () => {
     const s = getSettings(db);
     expect(s.whatsapp_number).toBe("11999990000");
     expect(s.hero_image_url).toMatch(/unsplash/);
-    expect(s.seed_version).toBe("2");
+    expect(s.seed_version).toBe("3");
+    expect(s.contact_email).toBe("juniorhp22@hotmail.com");
   });
 });

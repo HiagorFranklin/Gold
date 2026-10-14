@@ -169,7 +169,7 @@ export const DEFAULT_SETTINGS: Record<string, string> = {
   whatsapp_number: "32984762222",
   whatsapp_message:
     "Olá! Acessei o site da Gold Pharma e gostaria de obter informações sobre o atendimento e o catálogo.",
-  contact_email: "",
+  contact_email: "juniorhp22@hotmail.com",
   contact_phone: "(32) 98476-2222",
   address: "",
   business_hours: "Segunda a sexta, das 9h às 18h",
@@ -276,7 +276,7 @@ export function runSeed(db: Database.Database) {
       "INSERT INTO audit_log (admin_email, action, entity, details) VALUES ('sistema', 'seed', 'products', ?)",
     ).run(JSON.stringify({ products: PRODUCTS.length, status: "comercializacao_bloqueada" }));
 
-    db.prepare("INSERT INTO settings (key, value) VALUES ('seed_version', '2')").run();
+    db.prepare("INSERT INTO settings (key, value) VALUES ('seed_version', '3')").run();
   });
   tx();
 
@@ -310,9 +310,10 @@ function ensureInitialAdmin(db: Database.Database) {
   }
 }
 
-/** v2: WhatsApp, nome da empresa e fotografias (Unsplash License). Só preenche campos ainda vazios. */
+/** v2/v3: WhatsApp, e-mail, nome da empresa e fotografias (Unsplash License). Só preenche campos ainda vazios. */
 const V2_KEYS = [
   "whatsapp_number",
+  "contact_email",
   "contact_phone",
   "company_legal_name",
   "hero_image_url",
@@ -331,7 +332,7 @@ const V2_KEYS = [
 
 function applySettingsV2(db: Database.Database) {
   const version = Number((db.prepare("SELECT value FROM settings WHERE key = 'seed_version'").get() as { value: string }).value);
-  if (version >= 2) return;
+  if (version >= 3) return;
   db.transaction(() => {
     const url = db.prepare("UPDATE settings SET value = ? WHERE key = ? AND value = ''");
     for (const k of V2_KEYS.filter((k) => !k.endsWith("_alt"))) url.run(DEFAULT_SETTINGS[k], k);
@@ -341,6 +342,6 @@ function applySettingsV2(db: Database.Database) {
       const img = k.replace("_alt", "_url");
       alt.run(DEFAULT_SETTINGS[k], k, img, DEFAULT_SETTINGS[img]);
     }
-    db.prepare("UPDATE settings SET value = '2' WHERE key = 'seed_version'").run();
+    db.prepare("UPDATE settings SET value = '3' WHERE key = 'seed_version'").run();
   })();
 }
